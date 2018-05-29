@@ -92,7 +92,7 @@ function displayInventory (error, response) {
         colWidths: [10, 40, 20, 15, 15]
     });
     response.forEach(element => {
-        inventory.push([element.item_id, element.product_name, element.department_name, element.price, element.stock_quantity]);
+        inventory.push([element.item_id, element.product_name, element.department_name, "$" + parseFloat(element.price).toFixed(2), element.stock_quantity]);
     });
     console.log(inventory.toString());
     pause(userMenu);
@@ -103,7 +103,7 @@ function createMenu(callback) {
         if (error) throw error;
         var choicesArray = [];
         response.forEach(element => {
-            choicesArray.push(leftAlignText(element.item_id + ")", 7) + leftAlignText(element.department_name, 15) + " | " + leftAlignText(element.product_name, 35) + " | " + rightAlignText("$" + element.price, 11) + " | Stock: " + rightAlignText("" + element.stock_quantity, 10));
+            choicesArray.push(leftAlignText(element.item_id + ")", 7) + leftAlignText(element.department_name, 15) + " | " + leftAlignText(element.product_name, 35) + " | " + rightAlignText("$" + parseFloat(element.price).toFixed(2), 11) + " | Stock: " + rightAlignText("" + element.stock_quantity, 10));
         })
         callback(choicesArray);
     });
@@ -166,8 +166,18 @@ function addItemMenu() {
         name: "prodStock",
         validate: validateUnits
     }]).then(function (answer){
-        console.log(answer);
-        userMenu();
+        connection.query("INSERT INTO products SET ?", {
+            product_name: answer.prodName,
+            department_name: answer.prodDept,
+            price: parseFloat(answer.prodPrice).toFixed(2),
+            stock_quantity: parseInt(answer.prodStock)
+        }, function (error, response){   
+            console.log(seperator);
+            console.log(centerText("Added a new " + answer.prodName + " item in the " + answer.prodDept + " department"));
+            console.log(centerText("with a price of $" + parseFloat(answer.prodPrice).toFixed(2) + " and an initial inventory of " + answer.prodStock + " units."))
+            console.log(seperator);
+            userMenu();
+        });
     })
 }
 
