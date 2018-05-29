@@ -68,10 +68,10 @@ function userMenu () {
     }).then(function (answer) {
         switch(answer.userChoice) {
             case "View the inventory":
-                displayInventory();
+                connection.query("Select * from products ORDER BY department_name, product_name", displayInventory);
                 break;
             case "View low inventory":
-                displayLowInventory()
+                connection.query("Select * from products WHERE stock_quantity < 200 ORDER BY department_name, product_name", displayInventory);
                 break;
             case "Add to inventory":
                 createMenu(restockMenu);
@@ -85,7 +85,7 @@ function userMenu () {
     })
 }
 
-function displayInventory(){
+function displayInventory(error, response){
     connection.query("Select * from products ORDER BY department_name, product_name", function(error, response){
         if (error) throw error;
         var inventory = new Table({
@@ -98,6 +98,19 @@ function displayInventory(){
         console.log(inventory.toString());
         pause(userMenu);
     })
+}
+
+function displayInventory (error, response) {
+    if (error) throw error;
+    var inventory = new Table({
+        head: ["ID", "Product", "Department", "Price", "Stock"],
+        colWidths: [10, 40, 20, 15, 15]
+    });
+    response.forEach(element => {
+        inventory.push([element.item_id, element.product_name, element.department_name, element.price, element.stock_quantity]);
+    });
+    console.log(inventory.toString());
+    pause(userMenu);
 }
 
 function createMenu(callback) {
@@ -137,8 +150,11 @@ function restockMenu(choices) {
 }
 
 function executeRestock(itemID, amount) {
+    connection.query("SELECT item_id, stock_quantity, product_name, price FROM products WHERE ?", {item_id: itemID}, function (error, response){
+        if (error) throw error;
         console.log(seperator);
-        console.log(centerText("Added " + amount + " " + response[0].product_name) + "to the inventory.");
+        console.log(centerText("Added " + amount + " " + response[0].product_name + "to the inventory."));
+        console.log(centerText("There are now " + (response[0].stock_quantity + amount) + " units."))
         console.log(seperator);
         connection.query("UPDATE products SET ? WHERE ?", [
             {stock_quantity: response[0].stock_quantity + amount},
@@ -146,7 +162,8 @@ function executeRestock(itemID, amount) {
         ], function (error, response){
             if (error) throw error;
             pause(userMenu);
-        })
+        });
+    });
 }
 
 function end() {
