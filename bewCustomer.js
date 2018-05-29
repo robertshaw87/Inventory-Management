@@ -131,7 +131,8 @@ function purchaseMenu(choices) {
 }
 
 function executePurchase(itemID, amount) {
-    connection.query("SELECT item_id, stock_quantity, product_name, price FROM products WHERE ?", {item_id: itemID}, function (error, response){
+    connection.query("SELECT item_id, stock_quantity, product_name, price, product_sales FROM products WHERE ?", {item_id: itemID}, function (error, response){
+        var userCost = (parseFloat(response[0].price) * amount).toFixed(2);
         if (error) throw error;
         if (parseInt(response[0].stock_quantity) < amount) {
             console.log(seperator);
@@ -143,10 +144,13 @@ function executePurchase(itemID, amount) {
         } else {
             console.log(seperator);
             console.log(centerText("Purchased " + amount + " " + response[0].product_name));
-            console.log(centerText("for a total of $" + (parseFloat(response[0].price) * amount).toFixed(2) + "."));
+            console.log(centerText("for a total of $" + userCost + "."));
             console.log(seperator);
             connection.query("UPDATE products SET ? WHERE ?", [
-                {stock_quantity: response[0].stock_quantity - amount},
+                {
+                    stock_quantity: response[0].stock_quantity - amount,
+                    product_sales: response[0].product_sales + userCost
+                },
                 {item_id: itemID}
             ], function (error, response){
                 if (error) throw error;
