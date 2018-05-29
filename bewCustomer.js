@@ -42,6 +42,13 @@ function leftAlignText (str, width){
     return str;
 }
 
+function rightAlignText (str, width){
+    while (str.length < width){
+        str = " " + str;
+    }
+    return str;
+}
+
 function pause (callback) {
     inquirer.prompt({
         type: "input",
@@ -88,11 +95,11 @@ function displayInventory(){
 }
 
 function createMenu(callback) {
-    connection.query("Select item_id, product_name, price, stock_quantity FROM products ORDER BY department_name, product_name", function (error, response){
+    connection.query("Select item_id, product_name, department_name, price, stock_quantity FROM products ORDER BY department_name, product_name", function (error, response){
         if (error) throw error;
         var choicesArray = [];
         response.forEach(element => {
-            choicesArray.push(leftAlignText(element.item_id + ")", 7) + leftAlignText(element.product_name, 35) + " | $" + leftAlignText("" + element.price, 10) + " | Stock: " + leftAlignText("" + element.stock_quantity, 10));
+            choicesArray.push(leftAlignText(element.item_id + ")", 7) + leftAlignText(element.department_name, 15) + " | " + leftAlignText(element.product_name, 35) + " | " + rightAlignText("$" + element.price, 11) + " | Stock: " + rightAlignText("" + element.stock_quantity, 10));
         })
         callback(choicesArray);
     });
