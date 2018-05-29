@@ -5,13 +5,13 @@ USE bew_db;
 CREATE TABLE products (
     item_id INT NOT NULL AUTO_INCREMENT,
     product_name VARCHAR(35) NOT NULL,
-    deparment_name VARCHAR(15),
+    department_name VARCHAR(15),
     price DECIMAL(10,2) NOT NULL,
     stock_quantity INT NOT NULL,
     PRIMARY KEY (item_id)
 );
 
-INSERT INTO products (product_name, deparment_name, price, stock_quantity) VALUES
+INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES
 ("The Meaning of Life", "Necessities", 42, 0),
 ("Fluffy Towel", "Toiletries", 9.99, 5453),
 ("BEW T-Shirt", "Apparel", 19.99, 45312),

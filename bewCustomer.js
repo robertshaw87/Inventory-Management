@@ -1,8 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require("cli-table");
-const seperator = "\n==========\n";
-const width = 80;
+const seperator = "\n==========================================================================================================\n";
+const windowWidth = 106;
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -29,8 +29,15 @@ function start() {
 }
 
 function centerText (str) {
-    while (str.length < 80){
+    while (str.length < windowWidth){
         str = " " + str + " ";
+    }
+    return str;
+}
+
+function leftAlignText (str, width){
+    while (str.length < width){
+        str += " ";
     }
     return str;
 }
@@ -57,7 +64,7 @@ function userMenu () {
                 displayInventory();
                 break;
             case "Make a purchase":
-                purchaseMenu();
+                createMenu(purchaseMenu);
                 break;
             default:
                 end();
@@ -66,17 +73,58 @@ function userMenu () {
 }
 
 function displayInventory(){
-    connection.query("Select * from products", function(error, response){
+    connection.query("Select * from products ORDER BY department_name, product_name", function(error, response){
         var inventory = new Table({
             head: ["ID", "Product", "Department", "Price", "Stock"],
-            colWidths: [5, 35, 15, 10, 10]
+            colWidths: [10, 40, 20, 15, 15]
         });
         response.forEach(element => {
-            inventory.push([element.item_id, element.product_name, element.department_name, element.price, element.stock])
+            inventory.push([element.item_id, element.product_name, element.department_name, element.price, element.stock_quantity]);
         });
-        console.log(inventory);
+        console.log(inventory.toString());
         pause(userMenu);
     })
+}
+
+function createMenu(callback) {
+    connection.query("Select item_id, product_name, price, stock_quantity from products ORDER BY department_name, product_name", function (error, response){
+        var choicesArray = [];
+        response.forEach(element => {
+            choicesArray.push(leftAlignText(element.item_id + ")", 7) + leftAlignText(element.product_name, 35) + " | $" + leftAlignText("" + element.price, 10) + " | Stock: " + leftAlignText("" + element.stock_quantity, 10));
+        })
+        callback(choicesArray);
+    });
+}
+
+function purchaseMenu(choices) {
+    inquirer.prompt([{
+        type: "list",
+        name: "buySelection",
+        message: "What would you like to buy?",
+        choices: choices
+    },{
+        type: "input",
+        name: "buyAmount",
+        message: "How many would you like to buy?",
+        validate: function(input) {
+            if (parseInt(input) >= 0)
+                return true;
+            else {
+                console.log("\nPlease input a valid quantity.");
+                return false;
+            }
+        }
+    }]).then(function (answer) {
+        var selectionID = answer.buySelection.slice(0, 7);
+        selectionID = selectionID.split(")")[0];
+        console.log(selectionID)
+        executePurchase(selectionID, parseInt(answer.buyAmount));
+    })
+}
+
+function executePurchase(itemID, amount) {
+    console.log(itemID, " ", amount);
+    pause(userMenu);
 }
 
 function end() {
@@ -85,9 +133,10 @@ function end() {
     console.log(centerText("Bob's Emporium"));
     console.log(centerText("of Wonders*!"));
     console.log("");
-    console.log(centerText("Please come again!"));
-    console.log("");
     console.log(centerText("*Wonder not guaranteed"));
+    console.log("\n");
+    console.log(centerText("Please come again!"));
+
     console.log(seperator);
     connection.end();
 }
