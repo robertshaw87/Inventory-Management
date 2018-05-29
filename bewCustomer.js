@@ -25,7 +25,7 @@ function start() {
     console.log("");
     console.log(centerText("*Wonder not guaranteed"));
     console.log(seperator);
-    pause(userMenu);
+    userMenu();
 }
 
 function centerText (str) {
@@ -74,6 +74,7 @@ function userMenu () {
 
 function displayInventory(){
     connection.query("Select * from products ORDER BY department_name, product_name", function(error, response){
+        if (error) throw error;
         var inventory = new Table({
             head: ["ID", "Product", "Department", "Price", "Stock"],
             colWidths: [10, 40, 20, 15, 15]
@@ -87,7 +88,8 @@ function displayInventory(){
 }
 
 function createMenu(callback) {
-    connection.query("Select item_id, product_name, price, stock_quantity from products ORDER BY department_name, product_name", function (error, response){
+    connection.query("Select item_id, product_name, price, stock_quantity FROM products ORDER BY department_name, product_name", function (error, response){
+        if (error) throw error;
         var choicesArray = [];
         response.forEach(element => {
             choicesArray.push(leftAlignText(element.item_id + ")", 7) + leftAlignText(element.product_name, 35) + " | $" + leftAlignText("" + element.price, 10) + " | Stock: " + leftAlignText("" + element.stock_quantity, 10));
@@ -117,14 +119,34 @@ function purchaseMenu(choices) {
     }]).then(function (answer) {
         var selectionID = answer.buySelection.slice(0, 7);
         selectionID = selectionID.split(")")[0];
-        console.log(selectionID)
-        executePurchase(selectionID, parseInt(answer.buyAmount));
+        executePurchase(parseInt(selectionID), parseInt(answer.buyAmount));
     })
 }
 
 function executePurchase(itemID, amount) {
-    console.log(itemID, " ", amount);
-    pause(userMenu);
+    connection.query("SELECT item_id, stock_quantity, product_name, price FROM products WHERE ?", {item_id: itemID}, function (error, response){
+        if (error) throw error;
+        if (parseInt(response[0].stock_quantity) < amount) {
+            console.log(seperator);
+            console.log(centerText("We're sorry,"));
+            console.log(centerText("we do not have " + amount + " " + response[0].product_name + " in stock."));
+            console.log(centerText("Please try again later."));
+            console.log(seperator);
+            pause(userMenu);
+        } else {
+            console.log(seperator);
+            console.log(centerText("Purchased " + amount + " " + response[0].product_name));
+            console.log(centerText("for a total of $" + (parseFloat(response[0].price) * amount).toFixed(2) + "."));
+            console.log(seperator);
+            connection.query("UPDATE products SET ? WHERE ?", [
+                {stock_quantity: response[0].stock_quantity - amount},
+                {item_id: itemID}
+            ], function (error, response){
+                if (error) throw error;
+                pause(userMenu);
+            })
+        }
+    })
 }
 
 function end() {
@@ -134,9 +156,6 @@ function end() {
     console.log(centerText("of Wonders*!"));
     console.log("");
     console.log(centerText("*Wonder not guaranteed"));
-    console.log("\n");
-    console.log(centerText("Please come again!"));
-
     console.log(seperator);
     connection.end();
 }
