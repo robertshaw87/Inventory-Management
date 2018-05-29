@@ -85,21 +85,6 @@ function userMenu () {
     })
 }
 
-function displayInventory(error, response){
-    connection.query("Select * from products ORDER BY department_name, product_name", function(error, response){
-        if (error) throw error;
-        var inventory = new Table({
-            head: ["ID", "Product", "Department", "Price", "Stock"],
-            colWidths: [10, 40, 20, 15, 15]
-        });
-        response.forEach(element => {
-            inventory.push([element.item_id, element.product_name, element.department_name, element.price, element.stock_quantity]);
-        });
-        console.log(inventory.toString());
-        pause(userMenu);
-    })
-}
-
 function displayInventory (error, response) {
     if (error) throw error;
     var inventory = new Table({
@@ -134,14 +119,7 @@ function restockMenu(choices) {
         type: "input",
         name: "restockAmount",
         message: "How many units are you adding?",
-        validate: function(input) {
-            if (parseInt(input) >= 0)
-                return true;
-            else {
-                console.log("\nPlease input a valid quantity.");
-                return false;
-            }
-        }
+        validate: validateUnits
     }]).then(function (answer) {
         var selectionID = answer.restockSelection.slice(0, 7);
         selectionID = selectionID.split(")")[0];
@@ -164,6 +142,60 @@ function executeRestock(itemID, amount) {
             pause(userMenu);
         });
     });
+}
+
+function addItemMenu() {
+    inquirer.prompt([{
+        type: "input",
+        message: "Which department is this product in?",
+        name: "prodDept",
+        validate: validateNotEmpty
+    },{
+        type: "input",
+        message: "What is the name of the product?",
+        name: "prodName",
+        validate: validateNotEmpty
+    }, {
+        type: "input",
+        message: "What is the price of the product?",
+        name: "prodPrice",
+        validate: validatePrice
+    },{
+        type: "input",
+        message: "How many initial units do we have?",
+        name: "prodStock",
+        validate: validateUnits
+    }]).then(function (answer){
+        console.log(answer);
+        userMenu();
+    })
+}
+
+function validateNotEmpty (input) {
+    if (input)
+        return true;
+    else {
+        console.log("This field can not be empty")
+        return false;
+    }
+}
+
+function validateUnits (input) {
+    if (parseInt(input) >= 0)
+        return true;
+    else {
+        console.log("\nPlease input a valid quantity.");
+        return false;
+    }
+}
+
+function validatePrice (input) {
+    if (parseFloat(input) >= 0)
+        return true;
+    else {
+        console.log("\nPlease input a valid price.");
+        return false;
+    }
 }
 
 function end() {
