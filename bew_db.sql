@@ -32,4 +32,13 @@ INSERT INTO products (product_name, department_name, price, stock_quantity) VALU
 ("Teddy Bear (71 in.)", "Toys", 79.99, 938),
 ("Bobbydryl Anti-Allergy Supplement", "Medicine", 18.99, 729);
 
+INSERT INTO departments (department_name, over_head_costs) VALUES
+("Apparel", 30000),
+("Medicine", 21000),
+("Necessities", 5000),
+("Produce", 12000),
+("Toiletries", 10000),
+("Toys", 18000);
+
 SELECT * FROM products;
+SELECT * FROM departments;
