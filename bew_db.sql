@@ -8,7 +8,7 @@ CREATE TABLE products (
     department_name VARCHAR(15),
     price DECIMAL(10,2) NOT NULL,
     stock_quantity INT NOT NULL,
-    product_sales DECIMAL(30,2) NOT NULL DEFAULT 0,
+    product_sales DECIMAL(20,2) NOT NULL DEFAULT 0,
     PRIMARY KEY (item_id)
 );
 
@@ -33,9 +33,9 @@ INSERT INTO products (product_name, department_name, price, stock_quantity) VALU
 ("Bobbydryl Anti-Allergy Supplement", "Medicine", 18.99, 729);
 
 INSERT INTO departments (department_name, over_head_costs) VALUES
-("Apparel", 30000),
+("Apparel", 10000),
 ("Medicine", 21000),
-("Necessities", 5000),
+("Necessities", 50000),
 ("Produce", 12000),
 ("Toiletries", 10000),
 ("Toys", 18000);

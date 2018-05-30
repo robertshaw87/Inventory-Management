@@ -14,7 +14,12 @@ var connection = mysql.createConnection({
 
 connection.connect(function (error) {
     if (error) throw error;
-    start();
+    if (process.argv[2] === "manager" || process.argv[2] === "supervisor" || process.argv[2] === "employee")
+        employeeStart();
+    else if (process.argv[2]) {
+        console.log("\nWe're sorry, only team members are allowed in the back.\n");
+    } else
+        start();
 });
 
 function start() {
@@ -47,6 +52,30 @@ function end() {
     console.log(centerText("*Wonder not guaranteed"));
     console.log(seperator);
     connection.end();
+}
+
+function employeeStart() {
+    console.log(seperator);
+    console.log(centerText("Greetings"));
+    console.log(centerText("Bob's Emporium of Wonders*"));
+    console.log(centerText("Team Member!"));
+    console.log("");
+    console.log(centerText("*Wonder not guaranteed"));
+    console.log(seperator);
+    switch (process.argv[2]){
+        case "manager":
+            managerMenu();
+            break;
+        case "supervisor":
+            superviserMenu();
+            break;
+        case "employee":
+            chooseEmployee();
+            break;
+        default:
+            console.log("\nWe're sorry, only team members are allowed in the back.\n");
+            userMenu();
+    }
 }
 
 function employeeEnd() {
@@ -112,7 +141,7 @@ function userMenu () {
     inquirer.prompt({
         type: "list",
         name: "userChoice",
-        choices: ["See the inventory", "Make a purchase", "Employees Only", "Nothing for now"],
+        choices: ["See the inventory", "Make a purchase", "Nothing for now"],
         message: "What would you like to do?"
     }).then(function (answer) {
         switch(answer.userChoice) {
@@ -121,9 +150,6 @@ function userMenu () {
                 break;
             case "Make a purchase":
                 createMenu(purchaseMenu);
-                break;
-            case "Employees Only":
-                chooseEmployee();
                 break;
             default:
                 end();
@@ -181,7 +207,7 @@ function purchaseMenu(choices) {
 
 function executePurchase(itemID, amount) {
     connection.query("SELECT item_id, stock_quantity, product_name, price, product_sales FROM products WHERE ?", {item_id: itemID}, function (error, response){
-        var userCost = (parseFloat(response[0].price) * amount).toFixed(2);
+        var userCost = (parseFloat(response[0].price) * amount);
         if (error) throw error;
         if (parseInt(response[0].stock_quantity) < amount) {
             console.log(seperator);
@@ -193,12 +219,12 @@ function executePurchase(itemID, amount) {
         } else {
             console.log(seperator);
             console.log(centerText("Purchased " + amount + " " + response[0].product_name));
-            console.log(centerText("for a total of $" + userCost + "."));
+            console.log(centerText("for a total of $" + userCost.toFixed(2) + "."));
             console.log(seperator);
             connection.query("UPDATE products SET ? WHERE ?", [
                 {
                     stock_quantity: response[0].stock_quantity - amount,
-                    product_sales: response[0].product_sales + userCost
+                    product_sales: (response[0].product_sales + userCost).toFixed(2)
                 },
                 {item_id: itemID}
             ], function (error, response){
@@ -210,13 +236,6 @@ function executePurchase(itemID, amount) {
 }
 
 function chooseEmployee() {
-    console.log(seperator);
-    console.log(centerText("Greetings"));
-    console.log(centerText("Bob's Emporium of Wonders*"));
-    console.log(centerText("Team Member!"));
-    console.log("");
-    console.log(centerText("*Wonder not guaranteed"));
-    console.log(seperator);
     inquirer.prompt({
         type: "list",
         message: "What level are you?",
@@ -373,10 +392,17 @@ function superviserMenu() {
 }
 
 function prodSales() {
-    var query = "SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS total_sales FROM "
+    var query = "SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS total_sales FROM products LEFT JOIN departments ON products.department_name = departments.department_name GROUP BY department_name ORDER BY departments.department_id"
     connection.query(query, function (error, response){
         if (error) throw error;
-        console.log(response);
+        var salesTable = new Table({
+            head: ["ID", "Department", "Overhead", "Sales", "Profit"],
+            colWidths: [10, 20, 20, 20, 20]
+        });
+        response.forEach(element => {
+            salesTable.push([element.department_id, element.department_name, "$" + element.over_head_costs, "$" + element.total_sales, "$" + parseFloat(element.total_sales - element.over_head_costs).toFixed(2)])
+        })
+        console.log(salesTable.toString());
         pause(superviserMenu);
     })
 }
