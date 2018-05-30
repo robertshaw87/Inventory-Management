@@ -53,7 +53,7 @@ function employeeEnd() {
     console.log(seperator);
     console.log(centerText("Thank you valued team member!"));
     console.log(centerText("Bob's Emporium of Wonders*"));
-    console.log(centerText("appreciates your contribution"));
+    console.log(centerText("appreciates your contribution!"));
     console.log("");
     console.log(centerText("*Wonder not guaranteed"));
     console.log(seperator);
@@ -317,7 +317,7 @@ function deptArray (callback){
 
 function addItemMenu(deptArray) {
     inquirer.prompt([{
-        type: "rawlist",
+        type: "list",
         message: "Which department is this product in?",
         name: "prodDept",
         choices: deptArray
@@ -393,6 +393,16 @@ function addDeptMenu(deptArray) {
         name: "deptOverhead",
         validate: validatePrice
     }]).then(function (answer){
-        console.log(answer)
+        connection.query("INSERT INTO departments SET ?", {
+            department_name: answer.deptName,
+            over_head_costs: parseFloat(answer.deptOverhead).toFixed(2)
+        }, function (error, response){
+            if (error) throw error;
+            console.log(seperator);
+            console.log(centerText("Added a new " + answer.deptName + " department"));
+            console.log(centerText("with an overhead of $" + parseFloat(answer.deptOverhead).toFixed(2) + "."))
+            console.log(seperator);
+            superviserMenu();
+        })
     })
 }
