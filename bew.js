@@ -85,7 +85,7 @@ function validateNotEmpty (input) {
     if (input)
         return true;
     else {
-        console.log("This field can not be empty")
+        console.log("\nhis field can not be empty")
         return false;
     }
 }
@@ -103,7 +103,7 @@ function validatePrice (input) {
     if (parseFloat(input) >= 0)
         return true;
     else {
-        console.log("\nPlease input a valid price.");
+        console.log("\nPlease input a valid dollar amount.");
         return false;
     }
 }
@@ -239,11 +239,11 @@ function chooseEmployee() {
 function managerMenu () {
     inquirer.prompt({
         type: "list",
-        name: "userChoice",
+        name: "managerChoice",
         choices: ["View the inventory", "View low inventory", "Add to inventory", "Add new product", "Nothing for now"],
         message: "Welcome, Manager. What would you like to do?"
     }).then(function (answer) {
-        switch(answer.userChoice) {
+        switch(answer.managerChoice) {
             case "View the inventory":
                 displayInventory(managerMenu);
                 break;
@@ -254,7 +254,7 @@ function managerMenu () {
                 createMenu(restockMenu);
                 break;
             case "Add new product":
-                createDeptMenu(addItemMenu);
+                deptArray(addItemMenu);
                 break;
             default:
                 employeeEnd();
@@ -304,23 +304,23 @@ function executeRestock(itemID, amount) {
     });
 }
 
-function createDeptMenu (callback){
+function deptArray (callback){
     connection.query("SELECT department_name FROM departments", function (error, response){
         if (error) throw error;
-        var deptMenu = [];
+        var deptArray = [];
         response.forEach(element => {
-            deptMenu.push(element.department_name);
+            deptArray.push(element.department_name);
         });
-        callback(deptMenu);
+        callback(deptArray);
     })
 }
 
-function addItemMenu(deptMenu) {
+function addItemMenu(deptArray) {
     inquirer.prompt([{
         type: "rawlist",
         message: "Which department is this product in?",
         name: "prodDept",
-        choices: deptMenu
+        choices: deptArray
     },{
         type: "input",
         message: "What is the name of the product?",
@@ -349,5 +349,50 @@ function addItemMenu(deptMenu) {
             console.log(seperator);
             managerMenu();
         });
+    })
+}
+
+function superviserMenu() {
+    inquirer.prompt({
+        type: "list",
+        message: "Welcome, Supervisor. What would you like to do?",
+        choices: ["View product sales by department", "Create new department", "Nothing for now"],
+        name: "superviserChoice"
+    }).then(function (answer){
+        switch (answer.superviserChoice){
+            case "View product sales by department":
+                prodSales();
+                break;
+            case "Create new department":
+                deptArray(addDeptMenu)
+                break;
+            default:
+                employeeEnd();
+        }
+    })
+}
+
+function addDeptMenu(deptArray) {
+    inquirer.prompt([{
+        type: "input",
+        message: "What is the name of the department you wish to add?",
+        name: "deptName",
+        validate: function (input) {
+            if (!input){
+                console.log("\nThis field cannot be blank.");
+                return false;
+            } else if (deptArray.indexOf(input) != -1) {
+                console.log("\nThat department already exists.");
+                return false;
+            } else
+                return true;
+        }
+    },{
+        type: "input",
+        message: "What is the overhead for that department?",
+        name: "deptOverhead",
+        validate: validatePrice
+    }]).then(function (answer){
+        console.log(answer)
     })
 }
