@@ -372,6 +372,15 @@ function superviserMenu() {
     })
 }
 
+function prodSales() {
+    var query = "SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS total_sales FROM "
+    connection.query(query, function (error, response){
+        if (error) throw error;
+        console.log(response);
+        pause(superviserMenu);
+    })
+}
+
 function addDeptMenu(deptArray) {
     inquirer.prompt([{
         type: "input",
