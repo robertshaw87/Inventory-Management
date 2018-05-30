@@ -18,6 +18,7 @@ connection.connect(function (error) {
         employeeStart();
     else if (process.argv[2]) {
         console.log("\nWe're sorry, only team members are allowed in the back.\n");
+        pause(start);
     } else
         start();
 });
@@ -138,6 +139,7 @@ function validatePrice (input) {
 }
 
 function userMenu () {
+    console.log("");
     inquirer.prompt({
         type: "list",
         name: "userChoice",
@@ -236,6 +238,7 @@ function executePurchase(itemID, amount) {
 }
 
 function chooseEmployee() {
+    console.log("");
     inquirer.prompt({
         type: "list",
         message: "What level are you?",
@@ -256,6 +259,7 @@ function chooseEmployee() {
 }
 
 function managerMenu () {
+    console.log("");
     inquirer.prompt({
         type: "list",
         name: "managerChoice",
@@ -372,6 +376,7 @@ function addItemMenu(deptArray) {
 }
 
 function superviserMenu() {
+    console.log("");
     inquirer.prompt({
         type: "list",
         message: "Welcome, Supervisor. What would you like to do?",
