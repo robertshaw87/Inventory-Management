@@ -172,7 +172,7 @@ function displayTable(response, callback){
         colWidths: [10, 40, 20, 15, 15]
     });
     response.forEach(element => {
-        inventory.push([element.item_id, element.product_name, element.department_name, element.price, element.stock_quantity]);
+        inventory.push([element.item_id, element.product_name, element.department_name, parseFloat(element.price).toFixed(2), element.stock_quantity]);
     });
     console.log(inventory.toString());
     pause(callback);
@@ -397,7 +397,7 @@ function superviserMenu() {
 }
 
 function prodSales() {
-    var query = "SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS total_sales FROM products LEFT JOIN departments ON products.department_name = departments.department_name GROUP BY department_name ORDER BY departments.department_id"
+    var query = "SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) AS total_sales FROM products RIGHT JOIN departments ON products.department_name = departments.department_name GROUP BY department_name ORDER BY departments.department_id"
     connection.query(query, function (error, response){
         if (error) throw error;
         var salesTable = new Table({
@@ -405,7 +405,7 @@ function prodSales() {
             colWidths: [10, 20, 20, 20, 20]
         });
         response.forEach(element => {
-            salesTable.push([element.department_id, element.department_name, "$" + element.over_head_costs, "$" + element.total_sales, "$" + parseFloat(element.total_sales - element.over_head_costs).toFixed(2)])
+            salesTable.push([element.department_id, element.department_name, "$" + element.over_head_costs, "$" + (element.total_sales ? element.total_sales : 0.00), "$" + parseFloat(element.total_sales - element.over_head_costs).toFixed(2)])
         })
         console.log(salesTable.toString());
         pause(superviserMenu);
