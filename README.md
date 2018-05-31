@@ -17,7 +17,7 @@ If you pass `employee` as a command line argument, you'll be able to dive into t
 
 The manager interface allows you to see the current stock or just the products that are running low in inventory. You can also add more stock to an existing item or register a new item altogether.
 
-![Supervisor](readme/Supervisor.gif "Supervisor")
+![Supervisor](readme/supervisor.gif "Supervisor")
 
 The supervisor interface tracks the total profit on purchases made with the customer interface. It also factors in overhead costs for each department as specified in the accompanying SQL table. Supervisors can also create new departments that will be reflected when they view the total profits afterwards.
 
