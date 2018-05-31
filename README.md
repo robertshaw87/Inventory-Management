@@ -27,7 +27,13 @@ You must have node installed in your terminal with support for the Node Package 
 
 ### Installing
 
-![Install](readme/install.gif "Install")
+[MySQL Website](https://www.mysql.com/)
+
+Now we need to install MySQL. Navigate to the MySQL website and install the workbench and the local server. 
+
+![Install MySQL](readme/install-mysql.gif "Install MySQL")
+
+Once you have them installed, start up your local database and use the provided `bew_db.sql` file to initialize the database we're going to be using for this app.
 
 [Node.js Website](https://nodejs.org/en/)
 
@@ -40,13 +46,6 @@ Within that folder, run
 ```
 npm install
 ```
-
-![Install MySQL](readme/install-mysql.gif "Install MySQL")
-
-[MySQL Website](https://www.mysql.com/)
-
-Now we need to install MySQL. Navigate to the MySQL website and install the workbench and the local server. Once you have them installed, start up your local database and use the provided `bew_db.sql` file to initialize the database we're going to be using for this app.
-
 Now, you're ready! Just run
 ```
 node bew.js
@@ -59,6 +58,8 @@ node bew.js employee
 node bew.js manager
 node bew.js supervisor
 ```
+
+![Install](readme/install.gif "Install")
 
 ## Built With
 
