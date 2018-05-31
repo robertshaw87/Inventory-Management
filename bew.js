@@ -405,7 +405,7 @@ function prodSales() {
             colWidths: [10, 20, 20, 20, 20]
         });
         response.forEach(element => {
-            salesTable.push([element.department_id, element.department_name, "$" + element.over_head_costs, "$" + (element.total_sales ? element.total_sales : 0.00), "$" + parseFloat(element.total_sales - element.over_head_costs).toFixed(2)])
+            salesTable.push([element.department_id, element.department_name, "$" + element.over_head_costs, "$" + (element.total_sales ? parseFloat(element.total_sales).toFixed(2) : 0.00), "$" + parseFloat(element.total_sales - element.over_head_costs).toFixed(2)])
         })
         console.log(salesTable.toString());
         pause(superviserMenu);
