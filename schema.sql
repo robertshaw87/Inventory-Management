@@ -18,3 +18,6 @@ CREATE TABLE departments (
     over_head_costs DECIMAL(20,2) NOT NULL,
     PRIMARY KEY (department_id)
 );
+
+SELECT * FROM products;
+SELECT * FROM departments;
