@@ -81,6 +81,17 @@ node bew.js supervisor
 
 ## Challenges
 
+![SQL Join and Group](readme/sql-query.png "SQL Join and Group")
+
+This project was my first time diving deep into SQL and its interactions with the backend. I had an interesting time figuring out how the different joins behave. This single SQL query best demonstrates combining several components together in a meaningful way.
+
+![Display Table Callback](readme/callback.png "Display Table Callback")
+
+I reused my function that displayed the items for sale in both the customer interface and the manager interface by passing in a callback function. I'm always on the lookout for ways to streamline my code.
+
+![Text Align](readme/align-text.png "Text Align")
+
+This is a series of functions I wrote to help with aligning text in the terminal. I use these to automatically center messages and create my own table-like display of the items for sale in the inquirer prompts. They're pretty simple, but I did feel pretty clever after I made them since they saved a lot of time.
 
 ## Authors
 
