@@ -209,8 +209,8 @@ function purchaseMenu(choices) {
 
 function executePurchase(itemID, amount) {
     connection.query("SELECT item_id, stock_quantity, product_name, price, product_sales FROM products WHERE ?", {item_id: itemID}, function (error, response){
-        var userCost = (parseFloat(response[0].price) * amount);
         if (error) throw error;
+        var userCost = (parseFloat(response[0].price) * amount);
         if (parseInt(response[0].stock_quantity) < amount) {
             console.log(seperator);
             console.log(centerText("We're sorry,"));
