@@ -33,7 +33,7 @@ Now we need to install MySQL. Navigate to the MySQL website and install the work
 
 ![Install MySQL](readme/install-mysql.gif "Install MySQL")
 
-Once you have them installed, start up your local database and use the provided `bew_db.sql` file to initialize the database we're going to be using for this app.
+Once you have them installed, start up your local database and use the provided `schema.sql` and `seeds.sql` files to initialize the database we're going to be using for this app. Make sure to execute `schema.sql` first! That has the blueprint for the database that we're going to seed with our initial dataset with `seeds.sql`.
 
 [Node.js Website](https://nodejs.org/en/)
 
